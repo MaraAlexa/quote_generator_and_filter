@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Ajax - work with data</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Random Quotes by Marcus Aurelius</h1>
+    <h4>* Fetched from an external source</h4>
+    <blockquote>
+      <p id="quotation">Everything that happens happens as it should, and if you observe carefully, you will find this to be so. </p>
+      <p id="author">Marcus Aurelius</p>
+      <button class="generator-btn">Generate Quote</button>
+    </blockquote>
+    <br>
+    <h1 class="quotes"> Search for Quotes</h1>
+    <h4>* search by Keyword or author</h4>
+
+    <form class="search-form">
+      <input type="text" class="searchAuthor" placeholder="Search quote by Keyword or Author">
+      <!-- <input type="text" class="searchQuote" placeholder="Filter by quote words"> -->
+      <ul class="matchedQuotes">
+
+      </ul>
+    </form>
+  </div>
+<script>
+
+// some json data that includes quotes form Marcus Aurelius
+const dataEndpoint = 'https://raw.githubusercontent.com/judsonmitchell/stoic.space/master/sources/marcus.json';
+
+const quotes = []; // this gets all the cleandata from the dataEndpoint 
+
+// fetch data (returns a promise)
+fetch(dataEndpoint)
+  .then(messydata => messydata.json())
+  .then(cleandata => quotes.push(...cleandata)) // spread each individual argument into the push method
+  // -!!!- pushing cleandata into quotes array without the dots gives an Array of array(nested array)
+
+function findWord(wordToMatch, quotes) {
+  // return the filtered array
+  return quotes.filter(object => {
+    // return the word that matches the typed word
+    // return object.name.match(/mara/i)
+    const regex = new RegExp(wordToMatch, 'gi');
+    return object.author.match(regex) || object.quote.match(regex); // returns all the arrays that have the word typed in it
+  });
+}
+
+function displayMatchedQuotes() {
+  // console.log(this.value); - display the typed value
+  // use the findWord() func to find the word typed
+  const matchedValues = findWord(this.value, quotes);
+  console.log(matchedValues);
+
+  // loop through that array of objects and display it
+  const html = matchedValues.map(object => {
+    // highlight the searched word using replace (normal to highlighted)
+    const regex = new RegExp(this.value, 'gi'); // select the value typed
+    const authorName = object.author.replace(regex, `<span class="hl">${this.value}</span>`);
+    const quoteKeyword = object.quote.replace(regex, `<span class="hl">${this.value}</span>`);
+    const quote = object.quote.replace(regex, `<span class="hl">${this.value}</span>`);
+    return `
+      <li>
+        <span class="name">${authorName}</span>
+        <span class="dial_code"> ${quoteKeyword}</span>
+      </li>
+    `;
+  }).join('');
+  suggestions.innerHTML = html;
+}
+// GET RANDOM QUOTES
+function getRandomQuotes() {
+  let random = quotes[Math.floor(Math.random() * quotes.length)];
+  console.log("clicked");
+  console.log(random);
+  quotation.innerHTML = random.quote;
+  authorQuotation.innerHTML = random.cite + " - " + random.author;
+}
+
+// selections for the filter & events listeners
+const searchAuthorInput = document.querySelector('input.searchAuthor'); // select the input for author
+const suggestions = document.querySelector('.matchedQuotes'); // select the ul
+console.log(suggestions);
+searchAuthorInput.addEventListener('change', displayMatchedQuotes); // is trigered only when typing and clicking outside
+searchAuthorInput.addEventListener('keyup', displayMatchedQuotes); // is trigered when you release the key
+
+// selections for the generator & event listeners
+const generator = document.querySelector(".generator-btn");
+const quotation = document.querySelector("#quotation");
+const authorQuotation = document.querySelector('#author');
+generator.addEventListener('click', getRandomQuotes);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</script>
+  </body>
+</html>
